@@ -36,6 +36,7 @@ public class StairCase {
 
     public static void stairBuilder (int height) {
         if (height <= 0) {
+            System.out.println("The height has to be a positive integer");
             return;
         }
 
