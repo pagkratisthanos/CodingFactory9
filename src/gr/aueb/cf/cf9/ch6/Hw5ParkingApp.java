@@ -1,58 +1,61 @@
 import java.util.Arrays;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class Hw5ParkingApp {
+
     public static void main(String[] args) {
-        // Αρχικός πίνακας με άφιξη και αναχώρηση
-        int[][] arr = {{1012, 1136}, {1317, 1417}, {1015, 1020}};
+        int[][] arr = { {1012, 1056}, {1022, 1023}, {1317, 1417}, {1025, 1035}, {1027, 1034}};
+        int[][] transformed;
 
-        // Υπολογισμός μέγιστου αριθμού αυτοκινήτων
-        int maxCars = findMaxCars(arr);
+        transformed = transformArray(arr);
+        sortByTime(transformed);
 
-        System.out.println("Μέγιστος αριθμός αυτοκινήτων: " + maxCars);
+        for (int[] row : transformed) {
+            System.out.print(row[0] + " ");
+            System.out.println(row[1]);
+        }
+
+        System.out.println("Max Concurrent Cars in Garage: " + getMaxConcurrentCars(transformed));
     }
 
-    public static int findMaxCars(int[][] arr) {
-        // Βήμα 1: Δημιουργία πίνακα events
-        // Κάθε αυτοκίνητο έχει 2 events (άφιξη + αναχώρηση)
-        int[][] events = new int[arr.length * 2][2];
+    public static int[][] transformArray(int[][] arr) {
+        int[][] transformed = new int[arr.length*2][2];
 
-        int index = 0;
         for (int i = 0; i < arr.length; i++) {
-            // Άφιξη
-            events[index][0] = arr[i][0];  // Ώρα άφιξης
-            events[index][1] = 1;           // 1 = Άφιξη
-            index++;
-
-            // Αναχώρηση
-            events[index][0] = arr[i][1];  // Ώρα αναχώρησης
-            events[index][1] = 0;           // 0 = Αναχώρηση
-            index++;
+            transformed[i*2][0] = arr[i][0];
+            transformed[i*2][1] = 1;
+            transformed[i*2+1][0] = arr[i][1];
+            transformed[i*2+1][1] = 0;
         }
 
-        // Βήμα 2: Ταξινόμηση με βάση την ώρα
-        Arrays.sort(events, (e1, e2) -> {
-            if (e1[0] != e2[0]) {
-                return e1[0] - e2[0];  // Σύγκριση ωρών
-            }
-            return e1[1] - e2[1];      // Αν ίδια ώρα, αναχώρηση πρώτα
-        });
+        return transformed;
+    }
 
-        // Βήμα 3: Υπολογισμός μέγιστου
-        int currentCars = 0;
-        int maxCars = 0;
+    public static void sortByTime(int[][] arr) {
+        Arrays.sort(arr, Comparator.comparing((int[] a) -> a[0]));
+    }
 
-        for (int i = 0; i < events.length; i++) {
-            if (events[i][1] == 1) {
-                currentCars++;  // Άφιξη
-            } else {
-                currentCars--;  // Αναχώρηση
-            }
+    /**
+     * Returns the number of cars that are parked
+     * during the same time interval.
+     *
+     * @param arr   the source array with arrivals and departures
+     * @return      the concurrently parked cars
+     */
+    public static int getMaxConcurrentCars(int[][] arr) {
+        int count = 0;
+        int maxCount = 0;
 
-            if (currentCars > maxCars) {
-                maxCars = currentCars;
+        for (int[] ints : arr) {
+            if (ints[1] == 1){
+                count++;
+                if (count > maxCount) maxCount = count;
             }
+            else count--;
         }
 
-        return maxCars;
+        return maxCount;
     }
 }
